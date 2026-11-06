@@ -1,5 +1,5 @@
 import numpy as np
-from RegressionTree import RegressionTree
+from .RegressionTree import RegressionTree
 
 class GradientBoostingClassifier:
     """
