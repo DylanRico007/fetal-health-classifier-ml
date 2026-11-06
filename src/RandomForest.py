@@ -3,6 +3,8 @@ from DecisionTreeClassifier import DecisionTreeClassifier
 
 class RandomForestClassifier:
     """
+    --Bosque Aleatorio de clasificación multiclase--
+    
     Parámetros del constructor del bosque (__init__):
 
         - n_trees (int, por defecto=50):
