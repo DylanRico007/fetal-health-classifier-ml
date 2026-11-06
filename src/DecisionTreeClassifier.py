@@ -2,6 +2,8 @@ import numpy as np
 
 class DecisionTreeClassifier:
     """
+    --Árbol de Desición (Clasificación) para utilizar con el Bosque Aleatorio--
+    
     Parámetros que recibe el árbol:
     
         - max_depth (int, por defecto=10):
