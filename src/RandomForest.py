@@ -2,6 +2,20 @@ import numpy as np
 from DecisionTreeClassifier import DecisionTreeClassifier
 
 class RandomForestClassifier:
+    """
+    Parámetros del constructor del bosque (__init__):
+
+        - n_trees (int, por defecto=50):
+            Número total de árboles de decisión independientes que conformarán el bosque.
+        - max_depth (int, por defecto=10):
+            Profundidad máxima que se le pasará como parámetro a cada DecisionTreeClassifier.
+        - min_samples_split (int, por defecto=2):
+            Mínimo de muestras para dividir un nodo que se le pasará a cada DecisionTreeClassifier.
+        - seed (int, por defecto=0):
+            Semilla maestra para inicializar el generador aleatorio del muestreo Bootstrap y de los árboles.
+    """
+
+    #Constructor e inicialización del estado del bosque
     def __init__(self, n_trees=50, max_depth=10, min_samples_split=2, seed=0):
         self.n_trees = n_trees
         self.max_depth = max_depth
@@ -12,11 +26,13 @@ class RandomForestClassifier:
         self.classes_ = None
         self.n_classes_ = None
 
+    #Generación de muestras Bootstrap (muestreo aleatorio con reemplazo)
     def _bootstrap_sample(self, X, y, rng):
         n = len(X)
         indices = rng.integers(0, n, size=n)
         return X[indices], y[indices], indices
 
+    #Entrenamiento del Bosque Aleatorio
     def fit(self, X, y):
         X = np.asarray(X, dtype=float)
         self.classes_, y_encoded = np.unique(y, return_inverse=True)
@@ -40,6 +56,7 @@ class RandomForestClassifier:
             self.oob_indices_.append(np.setdiff1d(np.arange(len(X)), idx))
         return self
 
+    #Predicción del bosque por votación mayoritaria 
     def predict(self, X):
         X = np.asarray(X, dtype=float)
         all_votes = np.array([tree.predict(X) for tree in self.trees_])
@@ -49,6 +66,7 @@ class RandomForestClassifier:
         ])
         return self.classes_[majority_idx]
 
+    #Evaluación interna Out-Of-Bag (validación sin el conjunto de prueba externo)
     def oob_score(self, X, y):
         X = np.asarray(X, dtype=float)
         _, y_encoded = np.unique(y, return_inverse=True)
