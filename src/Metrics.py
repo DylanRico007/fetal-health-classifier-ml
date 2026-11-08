@@ -21,7 +21,7 @@ def recall(matriz_conf):
 
 
 # 3. Función para calcular F1-Score por clase
-def calcular_f1_score(matriz_conf):
+def f1_score(matriz_conf):
     f1_scores = []
     for i in range(len(matriz_conf)):
         vp = matriz_conf[i, i]
