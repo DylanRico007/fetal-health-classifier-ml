@@ -25,7 +25,7 @@ def calcular_f1_score(matriz_conf):
     f1_scores = []
     for i in range(len(matriz_conf)):
         vp = matriz_conf[i, i]
-        total_real_clase = np.sum(matriz_conf[i, :])  +
+        total_real_clase = np.sum(matriz_conf[i, :]) 
         total_pred_clase = np.sum(matriz_conf[:, i]) 
 
         recall = vp / total_real_clase if total_real_clase > 0 else 0.0
