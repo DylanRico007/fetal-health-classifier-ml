@@ -20,7 +20,7 @@ def recall(matriz_conf):
     return np.array(recalls)
 
 
-# 3. Función para calcular F1-Score por clase
+# 3. Función para calcular F1-Score por cada clase
 def f1_score(matriz_conf):
     f1_scores = []
     for i in range(len(matriz_conf)):
