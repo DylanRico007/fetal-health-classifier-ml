@@ -28,10 +28,22 @@ class RandomForestClassifier:
         self.classes_ = None
         self.n_classes_ = None
 
-    #Generación de muestras Bootstrap (muestreo aleatorio con reemplazo)
+    #Generación de muestras Bootstrap Balanceadas (corrección de desbalance, al no ser aleatorio)
     def _bootstrap_sample(self, X, y, rng):
         n = len(X)
-        indices = rng.integers(0, n, size=n)
+        clases_unicas = np.unique(y)
+        n_por_clase = n // len(clases_unicas)
+        
+        indices_balanceados = []
+        for c in clases_unicas:
+            idx_clase = np.where(y == c)[0]
+            #Toma muestras con reemplazo hasta igualar la proporción de clases
+            elegidos = rng.choice(idx_clase, size=n_por_clase, replace=True)
+            indices_balanceados.append(elegidos)
+            
+        #Une todos los índices y los mezcla aleatoriamente
+        indices = np.concatenate(indices_balanceados)
+        rng.shuffle(indices)
         return X[indices], y[indices], indices
 
     #Entrenamiento del Bosque Aleatorio
