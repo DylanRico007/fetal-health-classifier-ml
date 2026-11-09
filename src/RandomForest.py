@@ -41,7 +41,7 @@ class RandomForestClassifier:
             elegidos = rng.choice(idx_clase, size=n_por_clase, replace=True)
             indices_balanceados.append(elegidos)
             
-        #Une todos los índices y los mezcla aleatoriamente
+        #Une todos los índices y los mezcla 
         indices = np.concatenate(indices_balanceados)
         rng.shuffle(indices)
         return X[indices], y[indices], indices
