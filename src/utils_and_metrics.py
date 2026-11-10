@@ -15,8 +15,10 @@ def train_test_split(X, y, test_size=0.25, seed=0):
     """Divide matrices X e y en subconjuntos de entrenamiento y prueba."""
     rng = np.random.default_rng(seed)
     indices = rng.permutation(len(X))
-    n_test = int(round(len(X) * test_size))
-    test_idx, train_idx = indices[:n_test], indices[n_test:]
+    idx_train_end = int((1 - test_size) * len(X))
+    train_idx = indices[:idx_train_end]
+    test_idx = indices[idx_train_end:]
+    
     return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
 
 
