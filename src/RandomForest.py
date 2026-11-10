@@ -51,9 +51,9 @@ class RandomForestClassifier:
 
     #Entrenamiento del Bosque Aleatorio
     def fit(self, X, y):
-    """
-    Arreglar método
-    """
+    #"""
+    #Arreglar método
+    #"""
         X = np.asarray(X, dtype=float)
         self.classes_, y_encoded = np.unique(y, return_inverse=True)
         self.n_classes_ = len(self.classes_)
