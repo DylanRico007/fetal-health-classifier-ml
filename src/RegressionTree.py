@@ -38,6 +38,9 @@ class RegressionTree:
         self.tree_ = None
 
     #Búsqueda voraz de la característica y umbral que minimizan el error cuadrático (SSE)
+    """
+    Este método está mpdificado
+    """
     def _best_split(self, X, y):
         best_feature, best_threshold, best_sse = None, None, np.inf
         for feature in range(X.shape[1]):
