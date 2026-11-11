@@ -36,7 +36,6 @@ class LogisticRegression:
 
     #funcion activacion para transformar un valor numero en probabilidad de 0 y 1
     def sigmoide(self, z):
-        z = np.clip(z, -500, 500) #clipping para evitar overflow en la exponencial
         return 1 / (1 + np.exp(-z))
 
     #Predice la probabilidad de que cada muestra pertenezca a la clase 1
