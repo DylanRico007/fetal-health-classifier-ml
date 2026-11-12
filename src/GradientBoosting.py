@@ -27,7 +27,7 @@ class GradientBoostingClassifier:
     """
 
     #Constructor e inicialización de hiperparámetros del Gradient Boosting
-    def __init__(self, n_estimators=50, learning_rate=0.1, max_depth=3, balanced=balanced):
+    def __init__(self, n_estimators=50, learning_rate=0.1, max_depth=3, balanced=True):
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         self.max_depth = max_depth
