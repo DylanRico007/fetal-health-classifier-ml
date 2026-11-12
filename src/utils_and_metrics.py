@@ -101,7 +101,7 @@ def f1_score(matrix):
             f1_scores.append(2 * (p * r) / (p + r))
     return np.array(f1_scores)
 
-def calcular_roc_auc_binario(y_true_bin, y_scores):
+def calcular_roc_auc(y_true_bin, y_scores):
     """
     Calcula FPR, TPR y AUC para una clase binarizada (Uno contra el resto)
     """
@@ -130,7 +130,7 @@ def calcular_roc_auc_binario(y_true_bin, y_scores):
     return fpr, tpr, float(auc)
 
 
-def graficar_roc_multiclase(model, X_test, y_test):
+def roc(model, X_test, y_test):
     """
     Genera la gráfica ROC One-vs-Rest para las 3 clases y AUC.
     """
