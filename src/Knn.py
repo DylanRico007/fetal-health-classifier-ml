@@ -18,3 +18,4 @@ class KNNClassifier:
             votos = np.bincount(k_labels)
             preds.append(np.argmax(votos))
         return np.array(preds)
+
