@@ -17,7 +17,7 @@ class RandomForestClassifier:
             Semilla maestra para inicializar el generador aleatorio del muestreo Bootstrap y de los árboles.
     """
 
-    #Constructor e inicialización del estado del bosque
+    #Constructor e inicialización del estado del bosque aleatorio
     def __init__(self, n_trees=50, max_depth=10, min_samples_split=2, seed=0):
         self.n_trees = n_trees
         self.max_depth = max_depth
