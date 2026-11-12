@@ -109,34 +109,3 @@ class GradientBoostingClassifier:
             preds_stage = self.classes_[np.argmax(self._softmax(F), axis=1)]
             stages.append(preds_stage)
         return stages
-
-
-"""
-Sugerencia de implementación de algoritmo (según yo, puedes hacerlo como quieras).
-
-import pandas as pd
-import numpy as np
-from src.GradientBoosting import GradientBoostingClassifier
-
-    df = pd.read_csv('CTG_clean.csv')
-    X = df.drop(columns=['NSP']).values
-    y = df['NSP'].values
-
-    # División aleatoria: 80% entrenamiento / 20% prueba
-    rng = np.random.default_rng(0)
-    indices = rng.permutation(len(X))
-    split = int(0.8 * len(X))
-    X_train, X_test = X[indices[:split]], X[indices[split:]]
-    y_train, y_test = y[indices[:split]], y[indices[split:]]
-
-    model = GradientBoostingClassifier(n_estimators=50, learning_rate=0.1, max_depth=3)
-    model.fit(X_train, y_train)
-
-    stages = model.staged_predict(X_test)
-    print(f"Etapas registradas: {len(stages)}")
-    print(f"Coincide última etapa con predict: {np.all(stages[-1] == model.predict(X_test))}")
-    print(f"Exactitud en Train: {(model.predict(X_train) == y_train).mean():.4f}")
-    print(f"Exactitud en Test:  {(model.predict(X_test) == y_test).mean():.4f}")
-
-    #Esto más las métricas de F1-Score y Recall, porque el Acurracy solito es engañoso.
-"""
