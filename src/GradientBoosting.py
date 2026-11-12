@@ -63,8 +63,7 @@ class GradientBoostingClassifier:
         #Codifica automáticamente las clases [1.0, 2.0, 3.0] a índices [0, 1, 2]
         self.classes_, y_idx = np.unique(y, return_inverse=True)
         self.n_classes_ = len(self.classes_)
-        # Crea la matriz One-Hot de dimensión (n_samples, n_classes)
-        Y_onehot = np.eye(self.n_classes_)[y_idx]
+        Y_onehot = np.eye(self.n_classes_)[y_idx]   # Crea la matriz One-Hot de dimensión (n_samples, n_classes) 
 
         if self.balanced:  # Verifica si se activó el balanceo de clases
             self.init_ = np.zeros(self.n_classes_)  # Arranca con probabilidades iguales (neutras) para todas las clases
@@ -74,6 +73,9 @@ class GradientBoostingClassifier:
         else:  # Mantiene el flujo original si balanced=False
             self.init_ = self._initial_prediction(Y_onehot)
             sample_weights = 1.0  # Asigna peso neutro (1.0) a todos por igual
+            
+        F = np.tile(self.init_, (len(X), 1))
+        self.trees_ = []
 
         for _ in range(self.n_estimators):
             residuals = self._residuals(Y_onehot, F) * sample_weights  # Pondera los errores de probabilidad según el peso de la clase
