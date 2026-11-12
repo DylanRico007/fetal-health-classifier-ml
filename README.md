@@ -12,7 +12,7 @@ Proximamente
 * `/src/`: Implementaciones manuales de los algoritmos en Python.
 * `/docs/`: Reporte final en formato IEEE (LaTeX) y póster académico.
 
-## Tecnologías Utilizadas
+## Librerias Utilizadas
 * **Lenguaje:** Python 3.10+
 * **Manipulación de Datos:** Pandas, NumPy
 * **Visualización:** Matplotlib
