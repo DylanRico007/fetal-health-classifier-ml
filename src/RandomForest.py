@@ -25,13 +25,9 @@ class RandomForestClassifier:
         self.seed = seed
         self.trees_ = []
         self.oob_indices_ = []
-        self.classes_ = None
         self.n_classes_ = None
 
     #Generación de muestras Bootstrap Balanceadas (corrección de desbalance, al no ser aleatorio)
-    """
-    Este método está mpdificado
-    """
     def _bootstrap_sample(self, X, y, rng):
         n = len(X)
         clases_unicas = np.unique(y)
@@ -51,20 +47,14 @@ class RandomForestClassifier:
 
     #Entrenamiento del Bosque Aleatorio
     def fit(self, X, y):
-    #"""
-    #Arreglar método
-    #"""
-        X = np.asarray(X, dtype=float)
-        self.classes_, y_encoded = np.unique(y, return_inverse=True)
-        self.n_classes_ = len(self.classes_)
-
+        self.n_classes_ = len(np.unique(y))
         rng = np.random.default_rng(self.seed)
         max_features = max(1, int(np.sqrt(X.shape[1])))
         self.trees_ = []
         self.oob_indices_ = []
 
         for _ in range(self.n_trees):
-            X_b, y_b, idx = self._bootstrap_sample(X, y_encoded, rng)
+            X_b, y_b, idx = self._bootstrap_sample(X, y, rng)
             tree = DecisionTreeClassifier(
                 max_depth=self.max_depth,
                 min_samples_split=self.min_samples_split,
@@ -80,21 +70,20 @@ class RandomForestClassifier:
     def predict(self, X):
         X = np.asarray(X, dtype=float)
         all_votes = np.array([tree.predict(X) for tree in self.trees_])
-        majority_idx = np.array([
-            np.bincount(col, minlength=self.n_classes_).argmax()
+        #Bincount cuenta desde el índice 0, con [1:] ignoramos el 0 y sumamos 1 al argmax
+        majority_votes = np.array([
+            np.bincount(col, minlength=self.n_classes_ + 1)[1:].argmax() + 1
             for col in all_votes.T
         ])
-        return self.classes_[majority_idx]
+        return majority_votes
 
     #Evaluación interna Out-Of-Bag (validación sin el conjunto de prueba externo)
     def oob_score(self, X, y):
-        X = np.asarray(X, dtype=float)
-        _, y_encoded = np.unique(y, return_inverse=True)
         votes = np.zeros((len(X), self.n_classes_), dtype=int)
         for tree, oob in zip(self.trees_, self.oob_indices_):
             if len(oob) == 0:
                 continue
             preds = tree.predict(X[oob])
-            votes[oob, preds] += 1
+            votes[oob, preds - 1] += 1
         covered = votes.sum(axis=1) > 0
-        return np.mean(votes[covered].argmax(axis=1) == y_encoded[covered])
+        return np.mean((votes[covered].argmax(axis=1) + 1) == y[covered])
