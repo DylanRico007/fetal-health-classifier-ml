@@ -144,7 +144,7 @@ def roc(model, X_test, y_test):
     for c in [1, 2, 3]:
         # 1 si es la clase actual, 0 en otro caso
         y_bin = (y_test == c).astype(int)
-        fpr, tpr, auc_val = calcular_roc_auc_binario(y_bin, y_probas[:, c - 1])
+        fpr, tpr, auc_val = calcular_roc_auc(y_bin, y_probas[:, c - 1])
         aucs.append(auc_val)
 
         plt.plot(
