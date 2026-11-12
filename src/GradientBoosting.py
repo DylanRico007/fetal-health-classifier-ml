@@ -27,10 +27,11 @@ class GradientBoostingClassifier:
     """
 
     #Constructor e inicialización de hiperparámetros del Gradient Boosting
-    def __init__(self, n_estimators=50, learning_rate=0.1, max_depth=3):
+    def __init__(self, n_estimators=50, learning_rate=0.1, max_depth=3, balanced=True):
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         self.max_depth = max_depth
+        self.balanced = balanced
         self.init_ = None
         self.trees_ = []
         self.classes_ = None
@@ -52,26 +53,32 @@ class GradientBoostingClassifier:
 
     #Cálculo de los pseudo-residuos 
     def _residuals(self, Y_onehot, F):
-        #Residuo de probabilidad. La etiqueta real (0 o 1) menos probabilidad predicha
+        #Residuo de probabilidad. La etiqueta real (0 o 1) - probabilidad predicha
         return Y_onehot - self._softmax(F)
 
 
-    #Entrenamiento secuencial aditivo del modelo multiclase
+    #Entrenamiento secuencial del modelo multiclase
     def fit(self, X, y):
         X = np.asarray(X, dtype=float)
         #Codifica automáticamente las clases [1.0, 2.0, 3.0] a índices [0, 1, 2]
         self.classes_, y_idx = np.unique(y, return_inverse=True)
         self.n_classes_ = len(self.classes_)
-        # Crea la matriz One-Hot de dimensión (n_samples, n_classes)
-        Y_onehot = np.eye(self.n_classes_)[y_idx]
+        Y_onehot = np.eye(self.n_classes_)[y_idx]   # Crea la matriz One-Hot de dimensión (n_samples, n_classes) 
 
-        self.init_ = self._initial_prediction(Y_onehot)
-        # Inicializa la matriz F de tamaño (n_samples, n_classes)
+        if self.balanced:  # Verifica si se activó el balanceo de clases
+            self.init_ = np.zeros(self.n_classes_)  # Arranca con probabilidades iguales (neutras) para todas las clases
+            conteo = np.bincount(y_idx)  # Cuenta cuántos pacientes hay en cada clase
+            pesos_clase = len(y_idx) / (self.n_classes_ * conteo)  # Calcula peso inversamente proporcional a su frecuencia
+            sample_weights = pesos_clase[y_idx][:, None]  # Asigna a cada paciente el peso de su clase real
+        else:  # Mantiene el flujo original si balanced=False
+            self.init_ = self._initial_prediction(Y_onehot)
+            sample_weights = 1.0  # Asigna peso neutro (1.0) a todos por igual
+            
         F = np.tile(self.init_, (len(X), 1))
         self.trees_ = []
 
         for _ in range(self.n_estimators):
-            residuals = self._residuals(Y_onehot, F)
+            residuals = self._residuals(Y_onehot, F) * sample_weights  # Pondera los errores de probabilidad según el peso de la clase
             stage_trees = []
             # Entrena un RegressionTree por cada una de las K clases
             for k in range(self.n_classes_):
