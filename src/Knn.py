@@ -46,6 +46,11 @@ class KNNClassifier:
         nearest_indices = np.argsort(distances)[:self.n_neighbors]
         nearest_labels = self.y_train[nearest_indices]
         return Counter(nearest_labels.tolist()).most_common(1)[0][0]
+    
+    # Método de predicción de probabilidades para ROC/AUC
+    def predict_proba(self, X):
+        X = np.asarray(X, dtype=float)
+        return np.array([self._predict_proba_one(x) for x in X])
 
     # Método de predicción para un conjunto de muestras
     def predict(self, X):
