@@ -13,6 +13,9 @@ class GradientBoostingClassifier:
             Tasa de aprendizaje que multiplica la aportación de cada árbol para evitar sobreajuste.
         - max_depth (int, por defecto=3):
             Profundidad máxima que se le pasará como parámetro a cada RegressionTree individual.
+        - balanced (bool, por defecto=True):
+            Activa la ponderación inversa a la frecuencia de cada clase (sample_weights) e inicia
+            con probabilidades neutras para compensar el desbalance de datos.
 
     Parámetros que reciben los métodos internos y de entrenamiento/predicción:
 

@@ -2,30 +2,27 @@ import numpy as np
 
 class LogisticRegression:
 
-    """""
-    Regresion logistica / logistic regression
+    """
+    --Regresión Logística Binaria optimizada mediante Descenso de Gradiente--
 
-    Hiper_Parametros del modelo:
-    - Learning rate = 0.1
-        tasa de aprendizaje que controla los tamaños del paso del descenso de gradiente
-    - n_iterations = 1000
-        iteraciones a realizar para la optimizacion de base
-    - threshold (float, por defecto=0.3):
-        Umbral de probabilidad para asignar la clase 1.
-        Por defecto normalmente = 0.5, pero en este caso un ajuste de 0.3 puede ser más adecuado para predecir mejor la clase 1
-    
+    Parámetros que recibe el clasificador al inicializarse:
+
+        - learning_rate (float, por defecto=0.1):
+            Tasa de aprendizaje que controla el tamaño del paso en cada actualización del gradiente.
+        - n_iterations (int, por defecto=1000):
+            Número de iteraciones completas sobre el conjunto de entrenamiento para optimizar pesos y sesgo.
+
     Parámetros de datos que reciben los métodos de entrenamiento y predicción:
 
-    - X (forma [n_samples, n_features]):
-        Matriz de características predictoras numéricas.
-    - y (forma [n_samples]):
-        Vector con las etiquetas de clase codificadas como 0 o 1.
-    - weights (forma [n_features]):
-        Vector de pesos del modelo, uno por cada característica.
-    - biases (float):
-        Sesgo o intercepto del modelo.
-    
-    """""
+        - X, x (forma [n_samples, n_features]):
+            Matriz de características predictoras numéricas estandarizadas.
+        - y (forma [n_samples]):
+            Vector binario con las etiquetas de clase codificadas como 0 o 1.
+        - z (forma [n_samples]):
+            Combinación lineal (X · weights + biases) evaluada por la función sigmoide.
+        - threshold (float, por defecto=0.3):
+            Umbral de probabilidad utilizado en predict() para asignar la clase positiva (1).
+    """
 
     #Inicialización de hiperparámetros y pesos del modelo
     def __init__(self, learning_rate = 0.1, n_iterations = 1000):
