@@ -66,16 +66,19 @@ class RandomForestClassifier:
             self.oob_indices_.append(np.setdiff1d(np.arange(len(X)), idx))
         return self
 
-    #Predicción del bosque por votación mayoritaria 
-    def predict(self, X):
-        X = np.asarray(X, dtype=float)
-        all_votes = np.array([tree.predict(X) for tree in self.trees_])
-        #Bincount cuenta desde el índice 0, con [1:] ignoramos el 0 y sumamos 1 al argmax
-        majority_votes = np.array([
-            np.bincount(col, minlength=self.n_classes_ + 1)[1:].argmax() + 1
+    # Probabilidades por clase basadas en la proporción de votos de los árboles
+    def predict_proba(self, X):
+        all_votes = np.array([tree.predict(X) for tree in self.trees_])  # (n_trees, n_samples)
+        # Cuenta votos para clase 1, 2, 3 y divide entre el total de árboles
+        probas = np.array([
+            np.bincount(col, minlength=self.n_classes_ + 1)[1:] / self.n_trees
             for col in all_votes.T
         ])
-        return majority_votes
+        return probas 
+
+    # Predicción de clase final reutilizando las probabilidades
+    def predict(self, X):
+        return self.predict_proba(X).argmax(axis=1) + 1
 
     #Evaluación interna Out-Of-Bag (validación sin el conjunto de prueba externo)
     def oob_score(self, X, y):
