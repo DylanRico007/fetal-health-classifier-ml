@@ -163,7 +163,7 @@ def roc(model, X_test, y_test):
     plt.xlabel("Tasa de Falsos Positivos (FPR)", fontsize=11)
     plt.ylabel("Tasa de Verdaderos Positivos (TPR / Recall)", fontsize=11)
     plt.title(
-        f"Curva ROC Multiclase (One-vs-Rest) - Random Forest\n AUC = {np.mean(aucs):.4f}",
+        f"Curva ROC Multiclase (One-vs-Rest)\n AUC = {np.mean(aucs):.4f}",
         fontsize=12,
     )
     plt.legend(loc="lower right", frameon=True)
