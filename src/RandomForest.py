@@ -3,7 +3,7 @@ from .DecisionTreeClassifier import DecisionTreeClassifier
 
 class RandomForestClassifier:
     """
-    --Bosque Aleatorio de clasificación multiclase--
+    --Bosque Aleatorio de clasificación multiclase con Bootstrap Balanceado--
     
     Parámetros del constructor del bosque (__init__):
 
@@ -15,6 +15,16 @@ class RandomForestClassifier:
             Mínimo de muestras para dividir un nodo que se le pasará a cada DecisionTreeClassifier.
         - seed (int, por defecto=0):
             Semilla maestra para inicializar el generador aleatorio del muestreo Bootstrap y de los árboles.
+
+    Parámetros de datos que reciben los métodos de entrenamiento, muestreo y predicción:
+
+        - X (forma [n_samples, n_features]):
+            Matriz con las variables predictoras numéricas de cada muestra.
+        - y (forma [n_samples]):
+            Vector con las etiquetas originales de clase (ej. 1, 2, 3).
+        - rng (np.random.Generator):
+            Generador aleatorio utilizado en _bootstrap_sample para remuestrear con reemplazo
+            igualando la proporción de todas las clases.
     """
 
     #Constructor e inicialización del estado del bosque
