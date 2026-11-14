@@ -12,7 +12,7 @@ def gradient_descent(grad_fn, x0, learning_rate=0.1, n_iterations=100):
     return x
 
 
-def train_test_split_stratified(X, y, test_size=0.20, seed=42):
+def train_test_split(X, y, test_size=0.20, seed=42):
     """
     Divide los datos en entrenamiento y prueba manteniendo la proporción
     de cada clase (estratificación). Utiliza únicamente NumPy.
