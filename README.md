@@ -1,4 +1,4 @@
-# Prevención de Mortalidad Fetal e Hipoxia mediante Machine Learning 
+# Clasificación del Estado Fetal mediante Cardiotocografía y Machine Learning.
 
 ##  Descripción del Proyecto
 Este proyecto integrador desarrolla modelos de clasificación para categorizar exámenes de cardiotocografía (frecuencia cardíaca fetal y contracciones uterinas) en tres estados clínicos: **Normal, Sospechoso y Patológico**. El objetivo es proveer una herramienta de triaje automático para prevenir hipoxia y mortalidad fetal.
