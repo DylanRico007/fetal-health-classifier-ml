@@ -8,5 +8,5 @@
 * **Formato Original:** `CTG.xls` (2,126 instancias, 40 atributos).
 
 ## 2. Política
-Este directorio contiene la materia prima sin procesar. Las transformaciones, imputación de nulos y estandarizaciones guardarán en `data/processed/`.
+Este directorio contiene la materia prima sin procesar. Las transformaciones, imputación de nulos y estandarizaciones se guardarán en `data/processed/`.
 
