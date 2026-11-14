@@ -1,0 +1,238 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{enumitem}
+\setlist[itemize]{label=-}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+
+\definecolor{cugdlindigo}{RGB}{52, 26, 112}
+\definecolor{cugdlblue}{RGB}{24, 62, 138}
+\definecolor{lightgray}{RGB}{245, 247, 250}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=cugdlblue,
+    urlcolor=cugdlblue
+}
+
+\setlength{\parskip}{0.45em}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{center}
+    {\large\textbf{\textcolor{cugdlindigo}{Licenciatura en Inteligencia Artificial y Ciencia de Datos --- CUGDL}}}\\[0.15cm]
+    {\normalsize\textbf{Matemáticas Aplicadas a la Ciencia de Datos}}\\[0.4cm]
+    {\LARGE\textbf{\textcolor{cugdlblue}{Desarrollo Matemático y Fundamentos Teóricos}}}\\[0.2cm]
+    {\normalsize\textbf{K Vecinos más Cercanos (KNN)} y \textbf{Árboles de Decisión para Clasificación}}
+\end{center}
+\vspace{0.3cm}
+
+En esta sección se hace formalmente el desarrollo matemático y teórico de dos de los algoritmos de aprendizaje supervisado utilizados en el proyecto: el clasificador basado en instancias \textbf{K Vecinos más Cercanos (KNN)} y el modelo jerárquico de particionamiento recursivo \textbf{Árboles de Decisión para Clasificación} (junto con su extensión por ensamble \textit{Random Forest}). Para cada algoritmo se detallan su formulación matemática, ecuaciones principales, función de costo, algoritmo de optimización, supuestos estructurales e interpretación matemática de hiperparámetros y métricas.
+
+\vspace{0.3cm}
+\section*{\textcolor{cugdlblue}{Modelo KNN (Vecinos Cercanos)}}
+
+\subsection*{1. Formulación Matemática}
+Sea $\mathcal{D} = \{(\mathbf{x}_1, y_1), (\mathbf{x}_2, y_2), \dots, (\mathbf{x}_N, y_N)\}$ un conjunto de datos de entrenamiento compuesto por $n$ observaciones, donde cada vector de características se define como $\mathbf{x}_i = (x_{i1}, x_{i2}, \dots, x_{ip}) \in \mathbb{R}^p$ en un espacio métrico $p$-dimensional, y $y_i \in \mathcal{C} = \{1, 2, \dots, K_{\text{clases}}\}$ representa la etiqueta de clase categórica asociada a la $i$-ésima observación.
+
+El modelo KNN es un método de aprendizaje supervisado basado en instancias (lazy learning o aprendizaje perezoso). A diferencia de los modelos paramétricos que estiman un vector fijo de pesos durante el entrenamiento, KNN proyecta observaciones directamente en el espacio métrico $(\mathbb{R}^p, d)$. Dada una nueva observación de prueba $\mathbf{x} = (x_1, x_2, \dots, x_p) \in \mathbb{R}^p$, el algoritmo induce un ordenamiento total sobre los elementos de $\mathcal{D}$ en función de su distancia hacia $\mathbf{x}$.
+A partir de los primeros $K \in \mathbb{Z}$ elementos de dicha permutación ordenada, se define el subconjunto de índices de la \textbf{$K$-vecindad más cercana} a $\mathbf{x}$, denotado como $N_K(\mathbf{x})$:
+\begin{equation}
+    N_K(\mathbf{x}) = \left\{ \mathbf{x}_{(1)}, \mathbf{x}_{(2)}, \dots, \mathbf{x}_{(K)} \right\} \subseteq \mathcal{D}
+\end{equation}
+
+\subsection*{2. Ecuaciones Principales y Métricas de Distancia}
+
+\begin{itemize}
+    \item \textbf{Distancia de Minkowski (Métrica Generalizada, norma $\ell_q$):}
+    
+    Es la formulación generalizada de distancia parametrizada por el orden $q \ge 1$:
+    \begin{equation}
+        d_{\text{Minkowski}}(\mathbf{x}, \mathbf{x}_i) = \|\mathbf{x} - \mathbf{x}_i\|_q = \left( \sum_{j=1}^{p} |x_j - x_{ij}|^q \right)^{\frac{1}{q}}
+    \end{equation}
+    Para que $d_{\text{Minkowski}}$ satisfaga los axiomas de un espacio métrico (en particular la desigualdad triangular), se requiere estrictamente que $q \ge 1$.
+
+    \item \textbf{Distancia de Manhattan($q = 1$, norma $\ell_1$):}
+    
+    Caso particular de la métrica de Minkowski cuando $q = 1$. Cuantifica la suma de las diferencias absolutas a lo largo de cada eje coordenado ortogonal:
+    \begin{equation}
+        d_{\text{Manhattan}}(\mathbf{x}, \mathbf{x}_i) = \|\mathbf{x} - \mathbf{x}_i\|_1 = \sum_{j=1}^{p} |x_j - x_{ij}|
+    \end{equation}
+
+    \item \textbf{Distancia Euclidiana ($q = 2$, norma $\ell_2$):}
+    
+    Caso particular de la métrica de Minkowski cuando $q = 2$. Representa la longitud del segmento de recta más corto que une ambos puntos en el espacio euclidiano $\mathbb{R}^p$:
+    \begin{equation}
+        d_{\text{Euclidiana}}(\mathbf{x}, \mathbf{x}_i) = \|\mathbf{x} - \mathbf{x}_i\|_2 = \sqrt{\sum_{j=1}^{p} (x_j - x_{ij})^2} = \sqrt{(\mathbf{x} - \mathbf{x}_i)^2 +(\mathbf{x} - \mathbf{x}_i)^2}
+    \end{equation}
+\end{itemize}
+
+\textbf{Ecuaciones de Preprocesamiento (Escalamiento de Variables):} Dado que cualquier norma $\ell_q$ depende directamente de la magnitud algebraica de $|x_j - x_{ij}|$, es matemáticamente indispensable aplicar una transformación sobre cada columna $j \in \{1, \dots, p\}$ antes de calcular distancias:
+\begin{equation}
+    \text{Estandarización (Z-Score):} \quad z_{ij} = \frac{x_{ij} - \mu_j}{\sigma_j}, \quad \text{donde } \mu_j = \frac{1}{N}\sum_{i=1}^{N} x_{ij}, \;\; \sigma_j = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(x_{ij}-\mu_j)^2}
+\end{equation}
+\begin{equation}
+    \text{Normalización Min-Max:} \quad x'_{ij} = \frac{x_{ij} - \min(\mathbf{x}_{\cdot j})}{\max(\mathbf{x}_{\cdot j}) - \min(\mathbf{x}_{\cdot j})} \in [0, 1]
+\end{equation}
+
+\subsection*{3. Función de Costo}
+El algoritmo KNN carece de una función de costo paramétrica diferenciable durante la fase de ajuste, dado que no optimiza coeficientes internos.
+
+\subsection*{4. Algoritmo de Optimización y Búsqueda}
+En su implementación directa (fuerza bruta), KNN difiere todo el trabajo computacional a la fase de inferencia mediante un algoritmo de búsqueda exhaustiva de complejidad temporal $\mathcal{O}(N \cdot p)$ por cada muestra evaluada:
+\begin{enumerate}
+    \item \textbf{Fase de almacenamiento (\texttt{fit}):} Se indexa en memoria la matriz estandarizada $\mathbf{X} \in \mathbb{R}^{N \times p}$ y el vector de etiquetas $\mathbf{y} \in \mathcal{C}^N$ con costo computacional $\mathcal{O}(1)$.
+    \item \textbf{Cálculo vectorial de distancias:} Dada una muestra de prueba $\mathbf{x}$, se evalúa el vector de distancias $\mathbf{d} \in \mathbb{R}^N$ donde cada entrada es $d_i = \|\mathbf{x} - \mathbf{x}_i\|_q$ para $i = 1, \dots, N$.
+    \item \textbf{Selección por ordenamiento parcial:} Se ordena el arreglo de pares $(d_i, i)$ de forma ascendente y se extraen los primeros $K$ índices $\{i_{(1)}, \dots, i_{(K)}\}$. Esta búsqueda geométrica se acelera mediante particionamiento espacial jerárquico con estructuras de datos como \textbf{KD-Trees} o \textbf{Ball Trees}, reduciendo la complejidad promedio de consulta a $\mathcal{O}(p \log N)$.
+    \item \textbf{Optimización de hiperparámetros:} La selección del número óptimo de vecinos $K^*$ y la métrica $q^*$ se realiza mediante búsqueda en rejilla con validación cruzada estratificada, minimizando $\mathcal{J}(K, q)$.
+\end{enumerate}
+
+\subsection*{5. Supuestos del Modelo}
+\begin{itemize}
+    \item \textbf{Supuesto de suavidad local y continuidad espacial (Hipótesis de Compacidad):} Se asume que puntos cercanos entre sí tienen alta probabilidad de pertenecer a la misma clase; es decir, la función de probabilidad condicional $P(Y = c \mid \mathbf{X} = \mathbf{x})$ es localmente constante dentro de la hiperesfera que encierra a $N_K(\mathbf{x})$.
+    \item \textbf{Isotropía e igual relevancia de características:} En las métricas de Minkowski no ponderadas, el modelo asume que todas las dimensiones $j = 1, \dots, p$ poseen la misma escala y el mismo poder discriminativo. Si existen variables irrelevantes o escalas dispares, la geometría de las distancias se distorsiona severamente.
+\end{itemize}
+
+\subsection*{6. Interpretación Matemática de Parámetros y Métricas}
+\begin{itemize}
+    \item \textbf{Hiperparámetro $K$ (Sesgo-Varianza):} Controla el radio efectivo de la vecindad y el grado de suavidad de la frontera de decisión.
+    \begin{itemize}
+        \item Si $K \to 1$, el clasificador tiene \textbf{bajo sesgo y alta varianza}: la frontera de decisión es sumamente irregular y se adapta al ruido local, generando \textbf{sobreajuste}.
+        \item Si $K \to N$, el clasificador tiene \textbf{alto sesgo y baja varianza}: las regiones locales se promedian en exceso hasta predecir siempre la clase mayoritaria global, provocando \textbf{subajuste}.
+    \end{itemize}
+    \item \textbf{Interpretación Geométrica del Parámetro $q$:} El conjunto de puntos equidistantes a $\mathbf{x}$ a una distancia $r$, definido por $B_q(\mathbf{x}, r) = \{\mathbf{z} \in \mathbb{R}^p : \|\mathbf{x} - \mathbf{z}\|_q \le r\}$, cambia su geometría según $q$:
+    \begin{itemize}
+        \item Para \textbf{Manhattan ($q=1$)} penaliza linealmente las desviaciones y es más robusta frente a valores atípicos extremos en coordenadas individuales.
+        \item Para \textbf{Euclidiana ($q=2$)}, es invariante ante rotaciones ortogonales del espacio de características, pero eleva al cuadrado las diferencias grandes.
+        \item Para \textbf{Minkowski ($q \to \infty$, Distancia de Chebyshev)}: 
+        
+        $\lim_{q \to \infty} \left(\sum_{j=1}^p |x_j - x_{ij}|^q\right)^{1/q} = \max_{1 \le j \le p} |x_j - x_{ij}|$.
+    \end{itemize}
+\end{itemize}
+\vspace{0.4cm}
+
+\section*{\textcolor{cugdlblue}{Modelo de Árboles de Decisión para Clasificación y Ensamble Random Forest}}
+
+\subsection*{1. Formulación Matemática}
+Un Árbol de Decisión para clasificación es un modelo no paramétrico que particiona recursivamente el espacio de características $\mathcal{X} \subseteq \mathbb{R}^p$ en un conjunto de $M$ regiones disjuntas denotadas como $R_1, R_2, \dots, R_M$. Cada región terminal $R_m$ corresponde a un \textbf{nodo hoja} del árbol.
+
+Sea $S_t \subseteq \mathcal{D}$ el subconjunto de muestras de entrenamiento que llegan a un nodo interno o terminal $t$, con cardinalidad $N_t = |S_t|$. La proporción empírica (probabilidad frecuentista) de observaciones pertenecientes a la clase $k \in \{1, \dots, K\}$ dentro del nodo $t$ se define como:
+\begin{equation}
+    p_{tk} = \frac{1}{N_t} \sum_{(\mathbf{x}_i, y_i) \in S_t} \mathbb{I}(y_i = k), \qquad \text{cumpliendo que } \sum_{k=1}^{K} p_{tk} = 1
+\end{equation}
+En un nodo hoja $m$ (región $R_m$), la clase predicha $\hat{c}_m$ se asigna por mayoría simple de las muestras contenidas en dicho nodo:
+\begin{equation}
+    \hat{c}_m = \arg\max_{k \in \{1, \dots, K\}} p_{mk}
+\end{equation}
+De este modo, la función de decisión global del árbol $T(\mathbf{x})$ se expresa formalmente como una combinación de funciones indicadoras sobre las regiones terminales:
+\begin{equation}
+    \hat{y} = T(\mathbf{x}) = \sum_{m=1}^{M} \hat{c}_m \, \mathbb{I}(\mathbf{x} \in R_m)
+\end{equation}
+
+\subsection*{2. Ecuaciones Principales: Medidas de Impureza y Ganancia}
+Para cuantificar el grado de homogeneidad o desorden de las etiquetas dentro de un nodo $t$ (con distribución de probabilidades), se definen dos funcionales de impureza fundamentales:
+
+\begin{itemize}
+    \item \textbf{Entropía de Shannon (utilizada en algoritmos como ID3):}
+    Proveniente de la Teoría de la Información, mide la incertidumbre promedio o el número mínimo de bits necesarios para codificar la clase de una observación seleccionada al azar en el nodo $t$:
+    \begin{equation}
+        H(S_t) = - \sum_{k=1}^{K} p_{tk} \log_2(p_{tk})
+    \end{equation}
+    donde por continuidad límite se adopta la convención $0 \log_2(0) = 0$.
+
+    \item \textbf{Índice de Impureza de Gini (utilizado en el algoritmo CART):}
+    Mide la probabilidad esperada de clasificar incorrectamente una observación tomada al azar del nodo $t$ si ésta fuera etiquetada aleatoriamente de acuerdo con la distribución de probabilidades $p_{tk}$ del propio nodo:
+    \begin{equation}
+        G(S_t) = \sum_{k=1}^{K} p_{tk}(1 - p_{tk}) = 1 - \sum_{k=1}^{K} p_{tk}^2
+    \end{equation}
+\end{itemize}
+
+\textbf{Partición de un Nodo y Ganancia de Información:}
+\begin{itemize}
+    \item \textbf{Esquema Multirrama Categórico (ID3):} Si se evalúa un atributo discreto $V$ con categorías posibles $c \in \text{Valores}(V)$, el conjunto $S_t$ se divide en subconjuntos $S_{t, V=c} = \{(\mathbf{x}_i, y_i) \in S_t : x_{iV} = c\}$. La \textbf{Ganancia de Información} $\Delta H(S_t, V)$ es la reducción esperada en la entropía:
+    \begin{equation}
+        \Delta H(S_t, V) = H(S_t) - \sum_{c \in V} \frac{|S_{t, V=c}|}{|S_t|} H(S_{t, V=c})
+    \end{equation}
+
+    \item \textbf{Esquema Binario para Variables Continuas (CART):} Para una variable predictora $j \in \{1, \dots, p\}$ y un umbral de corte $\tau \in \mathbb{R}$, el nodo $S_t$ se divide en dos nodos hijos: izquierdo $S_L(j, \tau) = \{(\mathbf{x}_i, y_i) \in S_t : x_{ij} \le \tau\}$ y derecho $S_R(j, \tau) = \{(\mathbf{x}_i, y_i) \in S_t : x_{ij} > \tau\}$. Sea $I(\cdot) \in \{G(\cdot), H(\cdot)\}$ la medida de impureza elegida; la \textbf{reducción de impureza} $\Delta I(S_t, j, \tau)$ es:
+    \begin{equation}
+        \Delta I(S_t, j, \tau) = I(S_t) - \left( \frac{N_L}{N_t} I(S_L(j, \tau)) + \frac{N_R}{N_t} I(S_R(j, \tau)) \right)
+    \end{equation}
+    donde $N_L = |S_L(j, \tau)|$ y $N_R = |S_R(j, \tau)|$, cumpliendo $N_L + N_R = N_t$.
+\end{itemize}
+
+\subsection*{3. Función de Costo}
+En la construcción del árbol, la optimización se formula a nivel local en cada nodo interno y a nivel global para la regularización (poda):
+
+\begin{itemize}
+    \item \textbf{Función de Costo Local de Partición (Criterio de Corte CART):}
+    En cada nodo $t$, encontrar el par óptimo $(j^*, \tau^*)$ que maximiza la ganancia de información $\Delta I(S_t, j, \tau)$ es matemáticamente equivalente a \textbf{minimizar la impureza ponderada de los nodos hijos}, dado que $I(S_t)$ es constante respecto a $(j, \tau)$:
+    \begin{equation}
+        \mathcal{J}_{\text{split}}(j, \tau) = \frac{N_L}{N_t} I\big(S_L(j, \tau)\big) + \frac{N_R}{N_t} I\big(S_R(j, \tau)\big)
+    \end{equation}
+    \begin{equation}
+        (j^*, \tau^*) = \arg\min_{j \in \mathcal{F}_t, \, \tau \in \mathcal{T}_j} \mathcal{J}_{\text{split}}(j, \tau)
+    \end{equation}
+
+    \item \textbf{Función de Costo Global con Penalización por Complejidad (Poda Costo-Complejidad):}
+    Para evitar que el árbol $T$ crezca indefinidamente memorizando el conjunto de entrenamiento, la función de costo global combina la impureza acumulada en sus $|T|$ hojas terminales con un término de regularización proporcional al número de hojas:
+    \begin{equation}
+        R_\alpha(T) = \sum_{m=1}^{|T|} \frac{N_m}{N} I(R_m) + \alpha |T|
+    \end{equation}
+    donde $\alpha \ge 0$ penaliza la complejidad estructural del árbol.
+\end{itemize}
+
+\subsection*{4. Algoritmo de Optimización: Inducción Voraz}
+Determinar el árbol binario globalmente óptimo es un problema computacionalmente intratable (\textbf{NP-Completo}). Por ello, los algoritmos ID3 y CART emplean una heurística de optimización \textbf{voraz (\textit{greedy}) de arriba hacia abajo (\textit{top-down})} mediante particionamiento recursivo:
+\begin{enumerate}
+    \item \textbf{Inicialización en la Raíz:} Se inicia en el nivel de profundidad $d = 0$ con la totalidad del conjunto de datos $S_0 = \mathcal{D}$ y se calcula la impureza basal $I(S_0)$.
+    \item \textbf{Búsqueda Exhaustiva Local:} En el nodo actual $t$, se selecciona el subconjunto de características candidatas $\mathcal{F}_t \subseteq \{1, \dots, p\}$ (todas las columnas en un árbol estándar, o un subconjunto aleatorio de tamaño $m_{\text{try}} = \lfloor\sqrt{p}\rfloor$ en cada nodo de un \textit{Random Forest}). Para cada característica $j \in \mathcal{F}_t$, se evalúan todos los umbrales candidatos $\tau$ y se selecciona el par $(j^*, \tau^*)$ que minimiza $\mathcal{J}_{\text{split}}(j, \tau)$.
+    \item \textbf{Ramificación Recursiva:} Se divide $S_t$ en $S_L(j^*, \tau^*)$ y $S_R(j^*, \tau^*)$ y se invoca recursivamente el procedimiento en ambos subnodos incrementando la profundidad a $d + 1$.
+    \item \textbf{Criterios de Parada (Poda Previa):} La recursión se detiene y el nodo $t$ se declara nodo hoja si se cumple cualquiera de las siguientes condiciones:
+    \begin{itemize}
+        \item Pureza absoluta: $I(S_t) = 0$ (todas las muestras pertenecen a una única clase).
+        \item Límite de profundidad máxima alcanzado: $d \ge \text{max\_depth}$.
+        \item Tamaño muestral insuficiente para dividir: $N_t < \text{min\_samples\_split}$.
+        \item Ninguna partición produce una reducción estricta de impureza ($\Delta I \le 0$).
+    \end{itemize}
+\end{enumerate}
+
+\subsection*{5. Supuestos del Modelo}
+\begin{itemize}
+    \item \textbf{Fronteras de decisión ortogonales a los ejes:} Al evaluar condiciones de la forma $x_{ij} \le \tau$ sobre una variable a la vez, el árbol asume que las clases pueden separarse mediante hiperplanos perpendiculares a los ejes coordenados.
+    \item \textbf{Ausencia de supuestos distributivos e invarianza ante transformaciones monótonas:} No asume normalidad, linealidad ni homocedasticidad. Además, dado que los cortes dependen únicamente del orden relativo de los valores $x_{ij}$, el árbol es completamente invariante al escalamiento, estandarización o cualquier transformación estrictamente creciente de las variables predictoras.
+    \item \textbf{Optimalidad local como aproximación de optimalidad global:} Se asume que maximizar la ganancia de información paso a paso en cada nodo conduce a una estructura global discriminativa satisfactoria.
+\end{itemize}
+
+\subsection*{6. Interpretación Matemática de Parámetros y Métricas}
+\begin{itemize}
+    \item \textbf{Cotas de Impureza (Gini vs. Entropía):}
+    \begin{itemize}
+        \item \textbf{Nodo Puro (Mínimo):} Si existe una clase $k^*$ tal que $p_{tk^*} = 1$ y $p_{tk} = 0$ para todo $k \neq k^*$, entonces $G(S_t) = 1 - 1^2 = 0$ y $H(S_t) = -1 \log_2(1) = 0$.
+        \item \textbf{Máxima Incertidumbre (Distribución Uniforme):} Si las $K$ clases son equiprobables dentro del nodo ($p_{tk} = \frac{1}{K}$ para todo $k$), ambas funciones alcanzan su máximo global:
+        \begin{equation}
+            G_{\max} = 1 - \sum_{k=1}^{K} \left(\frac{1}{K}\right)^2 = 1 - \frac{1}{K}
+        \end{equation}
+        \begin{equation}
+            H_{\max} = -\sum_{k=1}^{K} \frac{1}{K}\log_2\left(\frac{1}{K}\right) = \log_2(K)
+        \end{equation}
+    \end{itemize}
+    \item \textbf{Importancia de Características:} La relevancia matemática de cada variable predictora $j \in \{1, \dots, p\}$  mide la reducción total de impureza ponderada que aportó dicha variable en todos los nodos internos $t \in \mathcal{I}_j$ donde fue utilizada para dividir, normalizada para sumar $1$:
+    \begin{equation}
+        \text{Importancia}(j) = \frac{\sum_{t \in \mathcal{I}_j} \frac{N_t}{N} \Delta I(S_t, j, \tau_t)}{\sum_{l=1}^{p} \sum_{t \in \mathcal{I}_l} \frac{N_t}{N} \Delta I(S_t, l, \tau_t)} \in [0, 1]
+    \end{equation}
+    \item \textbf{Estimador \textit{Out-of-Bag} (OOB) en Random Forest:} En un muestreo con reemplazo de tamaño $N$, la probabilidad de que una observación específica $(\mathbf{x}_i, y_i)$ no sea seleccionada en la muestra bootstrap de un árbol es $\left(1 - \frac{1}{N}\right)^N \xrightarrow{N \to \infty} e^{-1} \approx 0.3679$ ($36.8\%$). Sea $\mathcal{B}^{(-i)} \subset \{1, \dots, B\}$ el subconjunto de árboles para los cuales la muestra $i$ quedó fuera de la bolsa (OOB). El \textbf{OOB Score} evalúa la exactitud de generalización sin requerir un conjunto de validación externo:
+    \begin{equation}
+        \text{OOB Score} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}\left( y_i = \operatorname{mode}_{b \in \mathcal{B}^{(-i)}} \big\{ T_b(\mathbf{x}_i) \big\} \right)
+    \end{equation}
+    \item \textbf{Hiperparámetros de Poda (\texttt{max\_depth}, \texttt{min\_samples\_split}, \texttt{min\_samples\_leaf}):} Un árbol con profundidad $d$ puede generar hasta $2^d$ hojas terminales. Disminuir \texttt{max\_depth} o incrementar \texttt{min\_samples\_split} restringe el número máximo de regiones $M$, reduciendo la varianza del modelo y previniendo el sobreajuste.
+\end{itemize}
+\end{document}
