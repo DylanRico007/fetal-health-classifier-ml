@@ -8,6 +8,17 @@
   url          = {https://doi.org/10.24432/C51S4N}
 }
 
+@article{ayres2000sisporto,
+  author       = {Ayres-de-Campos, Diogo and Bernardes, Jo{\~{a}}o and Costa-Pereira, Ant{\'o}nio and Pereira-Leite, Lu{\'i}s},
+  title        = {SisPorto 2.0: A program for automated analysis of cardiotocograms},
+  journaltitle = {Journal of Maternal-Fetal Medicine},
+  year         = {2000},
+  volume       = {9},
+  number       = {5},
+  pages        = {311--318},
+  doi          = {10.1002/1520-6661(200009/10)9:5<311::aid-mfm12>3.0.co;2-9}
+}
+
 @online{zucco_ml,
   author       = {Ju\'arez Zucco, Leonardo},
   title        = {Machine Learning desde Cero},
@@ -26,9 +37,8 @@
   pages        = {2825--2830},
   url          = {https://jmlr.org/papers/v12/pedregosa11a.html}
 }
-
-
 \end{filecontents*}
+
 
 \documentclass[11pt,conference,a4paper]{IEEEtran}
 \usepackage[utf8]{inputenc}
@@ -85,7 +95,7 @@ Cardiotocograf\'ia, clasificaci\'on multiclase, estado fetal, Random Forest, Gra
 % =====================================================================
 \section*{Parte I. Machine Learning e Inferencia Bayesiana: desarrollo experimental}
 \section{Introducci\'on y planteamiento del problema}
-La cardiotocograf\'ia registra la frecuencia card\'iaca fetal y la actividad uterina. A partir de las se\~nales se calculan caracter\'isticas que permiten describir patrones temporales y estad\'isticos relacionados con el comportamiento fetal. El conjunto \textit{Cardiotocography} contiene observaciones asociadas con una clasificaci\'on de estado fetal consensuada por especialistas, codificada como \texttt{NSP}: normal (1), sospechoso (2) y patol\'ogico (3) \parencite{uci_ctg}.
+La cardiotocograf\'ia registra la frecuencia card\'iaca fetal y la actividad uterina. A partir de las se\~nales se calculan caracter\'isticas que permiten describir patrones temporales y estad\'isticos relacionados con el comportamiento fetal. El conjunto \textit{Cardiotocography} contiene observaciones asociadas con una clasificaci\'on de estado fetal consensuada por especialistas, codificada como \texttt{NSP}: normal (1), sospechoso (2) y patol\'ogico (3) \parencite{uci_ctg, ayres2000sisporto}.
 
 El problema se plantea como clasificaci\'on supervisada multiclase. Su dificultad principal no radica solamente en separar tres etiquetas, sino en que las categor\'ias presentan una distribuci\'on desigual y algunos patrones pueden compartir caracter\'isticas. Una m\'etrica global alta puede ocultar errores en las clases minoritarias, por lo que resulta necesario analizar el comportamiento individual de cada categor\'ia.
 
