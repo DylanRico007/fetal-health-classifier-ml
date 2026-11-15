@@ -1,0 +1,10 @@
+REPORTE FINAL: ReporteFinal_ML_MAT
+
+Para compilar en Overleaf:
+
+1. Importa este archivo como un proyecto nuevo.
+2. En Menu > Main document, selecciona ReporteFinal_ML_MAT.tex.
+3. Usa pdfLaTeX como compilador. La bibliografia se gestiona con Biber mediante biblatex.
+4. Compila el proyecto. Se incluyen el archivo .bib y las imagenes necesarias.
+
+Los resultados y tiempos de ejecucion de los modelos se conservaron; no se volvieron a ejecutar los notebooks.
