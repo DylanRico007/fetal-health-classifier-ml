@@ -29,11 +29,13 @@ class KNNClassifier:
         self.n_neighbors = n_neighbors
         self.X_train = None
         self.y_train = None
+        self.classes_ = None
 
     # Almacenamiento del conjunto de entrenamiento (aprendizaje perezoso / lazy learning)
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
+        self.classes_ = np.unique(y)
         return self
 
     # Cálculo de la distancia euclidiana entre dos vectores de características
@@ -46,7 +48,15 @@ class KNNClassifier:
         nearest_indices = np.argsort(distances)[:self.n_neighbors]
         nearest_labels = self.y_train[nearest_indices]
         return Counter(nearest_labels.tolist()).most_common(1)[0][0]
-    
+
+    # Cálculo de probabilidades por clase según la proporción de votos de los K vecinos
+    def _predict_proba_one(self, x):
+        distances = np.array([self._euclidean_distance(x, x_train) for x_train in self.X_train])
+        nearest_indices = np.argsort(distances)[:self.n_neighbors]
+        nearest_labels = self.y_train[nearest_indices]
+        counts = Counter(nearest_labels.tolist())
+        return np.array([counts.get(c, 0) / self.n_neighbors for c in self.classes_])
+
     # Método de predicción de probabilidades para ROC/AUC
     def predict_proba(self, X):
         X = np.asarray(X, dtype=float)

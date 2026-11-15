@@ -12,14 +12,25 @@ def gradient_descent(grad_fn, x0, learning_rate=0.1, n_iterations=100):
     return x
 
 
-def train_test_split(X, y, test_size=0.25, seed=0):
-    """Divide matrices X e y en subconjuntos de entrenamiento y prueba."""
+def train_test_split(X, y, test_size=0.20, seed=42):
+    """
+    Divide los datos en entrenamiento y prueba manteniendo la proporción
+    de cada clase (estratificación). Utiliza únicamente NumPy.
+    """
     rng = np.random.default_rng(seed)
-    indices = rng.permutation(len(X))
-    idx_train_end = int((1 - test_size) * len(X))
-    train_idx = indices[:idx_train_end]
-    test_idx = indices[idx_train_end:]
-    
+    train_idx, test_idx = [], []
+
+    for clase in np.unique(y):
+        idx = np.where(y == clase)[0]
+        rng.shuffle(idx)
+
+        n_test = round(len(idx) * test_size)
+        test_idx.extend(idx[:n_test])
+        train_idx.extend(idx[n_test:])
+
+    rng.shuffle(train_idx)
+    rng.shuffle(test_idx)
+
     return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
 
 
