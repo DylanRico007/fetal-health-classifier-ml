@@ -14,10 +14,7 @@
 \sisetup{output-decimal-marker={.}}
 \begin{document}
 
-% =================================================
-% ENCABEZADO A UNA COLUMNA: titulo, autores, afiliacion y resumen.
-% El contenido posterior se distribuye en dos columnas.
-% =================================================
+% ENCABEZADO A UNA COLUMNA
 \twocolumn[{
 \begin{center}
 {\LARGE\bfseries CLASIFICACIÓN DEL ESTADO FETAL MEDIANTE CARDIOTOCOGRAFÍA Y MACHINE LEARNING.\par}
@@ -67,7 +64,10 @@ En la implementación propia, el entrenamiento conserva los datos de referencia,
 \[
 O\left(M(Np+N\log N)\right).
 \]
-Con $p$ fijo se simplifica a $O(MN\log N)$. La implementación de \texttt{scikit-learn} utilizó distancia euclidiana, \texttt{algorithm=auto} y \texttt{n\_jobs=-1}. Para el número de características utilizado, el análisis considera búsqueda por fuerza bruta, con costo aproximado de predicción $O(MNp)$ esto se mantiene ya que aun si la vectorizacion y paralelismo ayudan a reducir tiempo practio esto no significa que se elimina el trabajo asintótico. Para mención del entrenamiento es la misma que el propio al haberse seleccionado el algoritmo bruteforce al solo hacer un almacenamiento de datos directo y no una copia por lo cual es $O(1)$, los otros algoritmos como kd tree y ball tree usan $O(pNlogN)$ lo cual solo se mencionara pues no hacen parte de este caso al tener p > 15 se selecciona bruteforce por el auto (Scikit-learn Developers, 2026)..
+Con $p$ fijo se simplifica a $O(MN\log N)$. La implementación de \texttt{scikit-learn} utilizó distancia euclidiana, \texttt{algorithm=auto} y \texttt{n\_jobs=-1}. Para el número de características utilizado, el análisis considera búsqueda por fuerza bruta, con costo aproximado de predicción $O(MNp)$ esto se mantiene ya que aun si la vectorizacion y paralelismo ayudan a reducir tiempo practio esto no significa que se elimina el trabajo asintótico. En la implementación propia, el entrenamiento únicamente almacena las referencias de los datos, por lo que su costo adicional es constante: \(O(1)\).
+
+En scikit-learn, el entrenamiento realiza validaciones y preparación de los datos antes de almacenarlos. Por ello, su costo depende del tamaño del conjunto de entrada y puede aproximarse por $O(Np) $. Como las características se mantienen fijas en este experimento (p=21), el crecimiento respecto al número de registros es lineal: $O(N) $. 
+Los otros algoritmos como kd tree y ball tree usan $O(pNlogN)$ lo cual solo se mencionara pues no hacen parte de este caso al tener p > 15 se selecciona bruteforce por el auto (Scikit-learn Developers, 2026)..
 
 \subsection{Regresión logística multiclase OvR}
 La regresión logística se adaptó al problema de tres clases mediante One-vs-Rest (OvR). Se entrena un clasificador binario por clase y la predicción final corresponde al mayor puntaje (Scikit-learn Developers, 2026). La implementación propia utilizó tasa de aprendizaje 0.1 y 2\,000 iteraciones de descenso de gradiente por lotes. Su complejidad de entrenamiento se aproxima por:
@@ -155,6 +155,8 @@ La Tabla~\ref{tab:fit} presenta las medianas de entrenamiento para tres tamaños
 \label{fig:tiempos-fit}
 \end{figure}
 
+La Figura 1 permite observar cómo cambian los tiempos de entrenamiento de las cuatro implementaciones conforme aumenta el tamaño de la muestra.
+
 \subsection{Tiempos de predicción}
 La Tabla~\ref{tab:predict} presenta los tiempos de predicción. En KNN propio, el costo aumenta considerablemente con el tamaño del conjunto de entrenamiento debido al cálculo y ordenamiento de distancias. La implementación de \texttt{scikit-learn} reduce notablemente este tiempo.
 
@@ -182,6 +184,8 @@ La Tabla~\ref{tab:predict} presenta los tiempos de predicción. En KNN propio, e
 \caption{Comparación de los tiempos de predicción conforme aumenta el tamaño del conjunto de datos.}
 \label{fig:tiempos-predict}
 \end{figure}
+
+La Figura 2 muestra las diferencias en los tiempos de predicción, destacando el crecimiento del KNN propio frente a las implementaciones de scikit-learn.
 
 \subsection{Ajuste de las curvas temporales}
 \begin{table}[H]
