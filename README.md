@@ -7,7 +7,7 @@ Este proyecto integrador desarrolla modelos de clasificación para categorizar e
 * `/data/`: Conjunto de datos crudos y procesados.
 * `/notebooks/`: Cuadernos Jupyter con el Análisis Exploratorio (EDA) y entrenamiento.
 * `/src/`: Implementaciones manuales de los algoritmos en Python.
-* `/docs/`: Reporte final con implementación Matemática y Procesos de Machine Learning en formato IEEE (LaTeX), Reporte de Complejidad Computacional y póster académico.
+* `/docs/`: Reporte final con implementación Matemática y Procesos de Machine Learning, Reporte de Complejidad Computacional y Póster académico.
 
 ## Librerias Utilizadas
 * **Lenguaje:** Python 3.10+
